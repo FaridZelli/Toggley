@@ -15,4 +15,4 @@ function toggleTheme() {
 	});
 }
 
-browser.browserAction.onClicked.addListener(toggleTheme);
+browser.action.onClicked.addListener(toggleTheme);
