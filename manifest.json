@@ -2,22 +2,27 @@
   "manifest_version": 3,
   "name": "Toggley",
   "short_name": "toggley",
-  "version": "1.3",
+  "version": "1.4",
   "author": "Farid Zelli",
   "homepage_url": "https://github.com/FaridZelli/Toggley",
   "description": "Switch between the default Light and Dark themes",
   "icons": {
-    "64": "icons/browser.svg"
+    "16": "icons/browser.svg",
+    "32": "icons/browser.svg"
   },
   "action": {
-    "browser_style": true,
     "default_icon": "icons/browser.svg",
     "default_title": "Toggle theme",
     "theme_icons": [
       {
         "light": "icons/light.svg",
         "dark": "icons/dark.svg",
-        "size": 64
+        "size": 16
+      },
+      {
+        "light": "icons/light.svg",
+        "dark": "icons/dark.svg",
+        "size": 32
       }
     ]
   },
