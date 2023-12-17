@@ -16,3 +16,22 @@ function toggleTheme() {
 }
 
 browser.action.onClicked.addListener(toggleTheme);
+
+function toggleSystemTheme() {
+	browser.management.get("default-theme@mozilla.org").then(info => {
+		browser.management.setEnabled("default-theme@mozilla.org", !info.enabled);
+	});
+}
+
+browser.menus.create({
+	id: "use-systemtheme",
+	type: "normal",
+	title: "Use system theme (auto)",
+	contexts: ["action"],
+	icons: {
+		"16": "icons/browser.svg",
+		"32": "icons/browser.svg"
+	},
+});
+
+browser.menus.onClicked.addListener(toggleSystemTheme);
