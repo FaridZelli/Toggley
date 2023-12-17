@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Toggley",
   "short_name": "toggley",
-  "version": "1.4",
+  "version": "1.5",
   "author": "Farid Zelli",
   "homepage_url": "https://github.com/FaridZelli/Toggley",
   "description": "Switch between the default Light and Dark themes",
@@ -27,7 +27,8 @@
     ]
   },
   "permissions": [
-    "management"
+    "management",
+    "menus"
   ],
   "background": {
     "scripts": [
