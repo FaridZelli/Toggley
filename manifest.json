@@ -5,7 +5,7 @@
   "version": "1.6",
   "author": "Farid Zelli",
   "homepage_url": "https://github.com/FaridZelli/Toggley",
-  "description": "Switch between the default Light and Dark themes",
+  "description": "Switch between Firefox's default Light and Dark themes.",
   "icons": {
     "16": "icons/browser.svg",
     "32": "icons/browser.svg"
