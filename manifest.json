@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Toggley",
   "short_name": "toggley",
-  "version": "1.5",
+  "version": "1.6",
   "author": "Farid Zelli",
   "homepage_url": "https://github.com/FaridZelli/Toggley",
   "description": "Switch between the default Light and Dark themes",
@@ -25,6 +25,14 @@
         "size": 32
       }
     ]
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Period"
+      },
+    "description": "Toggle browser theme"
+    }
   },
   "permissions": [
     "management",
