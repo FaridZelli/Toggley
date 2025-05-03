@@ -9,3 +9,5 @@
 - This project uses [Feather Icons](https://github.com/feathericons/feather).
 ---
 <img src="https://raw.githubusercontent.com/FaridZelli/Toggley/refs/heads/main/Screenshots/Toggley%20Showcase%20Compact%20Highlight.png" alt="" width="65%" align="center">
+
+- Or use the keyboard shortcut `Ctrl+Shift+0`! (configurable in the `Manage Extension Shortcuts` menu)
