@@ -31,13 +31,19 @@
       "suggested_key": {
         "default": "Ctrl+Shift+0"
       },
-    "description": "Toggle browser theme"
+      "description": "Toggle browser theme"
     }
   },
   "permissions": [
     "management",
-    "menus"
+    "storage",
+    "menus",
+    "alarms"
   ],
+  "options_ui": {
+    "page": "settings.html",
+    "open_in_tab": true
+  },
   "background": {
     "scripts": [
       "background.js"

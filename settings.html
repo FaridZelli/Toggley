@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #e2e2e2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .settings-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+    }
+
+    .settings-section {
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #444;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    label {
+      color: #555;
+      font-weight: 500;
+      font-size: 1rem;
+      flex: 1;
+    }
+
+    input[type="time"],
+    select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="time"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+    }
+
+    select {
+      flex: 2;
+    }
+
+    button#saveBtn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button#saveBtn:hover {
+      background-color: #0056b3;
+    }
+
+    #saveMsg,
+    #errorMsg {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    #saveMsg.success {
+      display: block;
+      color: #28a745;
+    }
+
+    #saveMsg.fail {
+      display: block;
+      color: #dc3545;
+    }
+
+    #errorMsg {
+      color: #dc3545;
+    }
+
+    @media (max-width: 480px) {
+      .settings-container {
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="settings-container">
+    <h1>Settings</h1>
+
+    <!-- Theme Schedule Section -->
+    <div class="settings-section">
+      <h2>Theme Schedule</h2>
+      <div class="form-group">
+        <label for="lightTime">🌞 Light Theme Start</label>
+        <input type="time" id="lightTime" />
+      </div>
+      <div class="form-group">
+        <label for="darkTime">🌙 Dark Theme Start</label>
+        <input type="time" id="darkTime" />
+      </div>
+    </div>
+
+    <!-- Save Button -->
+    <button id="saveBtn">💾 Save Settings</button>
+
+    <!-- Success and Error Messages -->
+    <div id="saveMsg"></div>
+    <div id="errorMsg"></div>
+  </div>
+
+  <!-- Link your external JS -->
+  <script src="settings.js"></script>
+</body>
+
+</html>
