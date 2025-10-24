@@ -1,37 +1,80 @@
-function toggleTheme() {
-	browser.management.getAll().then(extensions => {
-		for (let extension of extensions) {
-			if (extension.id !== 'firefox-compact-light@mozilla.org') continue;
-			if (extension.enabled) {
-				browser.management.get("firefox-compact-dark@mozilla.org").then(info => {
-					browser.management.setEnabled("firefox-compact-dark@mozilla.org", !info.enabled);
-				})
-			} else {
-				browser.management.get("firefox-compact-light@mozilla.org").then(info => {
-					browser.management.setEnabled("firefox-compact-light@mozilla.org", !info.enabled);
-				});
-			};
-		};
-	});
+async function getThemePrefs() {
+	const defaults = {
+		lightTheme: "firefox-compact-light@mozilla.org",
+		darkTheme: "firefox-compact-dark@mozilla.org",
+		lastUsed: "light"
+	};
+	const prefs = await browser.storage.sync.get(defaults);
+	return prefs;
+}
+
+async function toggleTheme() {
+	const { lightTheme, darkTheme, lastUsed } = await getThemePrefs();
+
+	// Get info for both themes
+	const lightInfo = await browser.management.get(lightTheme).catch(() => null);
+	const darkInfo = await browser.management.get(darkTheme).catch(() => null);
+
+	if (!lightInfo || !darkInfo) return;
+
+	if (lastUsed === "light") {
+		await browser.management.setEnabled(darkTheme, true);
+		await browser.storage.sync.set({ lastUsed: "dark" });
+	} else {
+		await browser.management.setEnabled(lightTheme, true);
+		await browser.storage.sync.set({ lastUsed: "light" });
+	}
 }
 
 browser.action.onClicked.addListener(toggleTheme);
 
-function toggleSystemTheme() {
-	browser.management.get("default-theme@mozilla.org").then(info => {
-		browser.management.setEnabled("default-theme@mozilla.org", !info.enabled);
+async function updateIconColor() {
+	// Get stored light/dark theme IDs from extension settings
+	const { lightTheme, darkTheme } = await browser.storage.sync.get({
+		lightTheme: "firefox-compact-light@mozilla.org",
+		darkTheme: "firefox-compact-dark@mozilla.org"
 	});
+
+	// Get currently enabled themes
+	const themes = await browser.management.getAll();
+	const enabledTheme = themes.find(ext => ext.type === "theme" && ext.enabled);
+
+	// Determine theme based on stored IDs
+	let currentMode = "light";
+	if (enabledTheme) {
+		if (enabledTheme.id === darkTheme) currentMode = "dark";
+		else if (enabledTheme.id === lightTheme) currentMode = "light";
+		else {
+			// Current theme is something else, default to light
+			currentMode = "light";
+		}
+	}
+
+	// Get theme colors for stroke
+	const theme = await browser.theme.getCurrent();
+	const colors = theme?.colors || {};
+
+	// Determine fallback color based on system color scheme
+	const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+	const fallbackColor = systemPrefersDark ? "rgb(251,251,254)" : "rgb(91,91,102)";
+
+	// Fallback order: icons -> toolbar_text -> system color scheme
+	const strokeColor = colors.icons ?? colors.toolbar_text ?? fallbackColor;
+
+	// SVGs
+	const svgLight = `
+	<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+
+	const svgDark = `
+	<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+
+	const svg = currentMode === "dark" ? svgLight : svgDark;
+
+	// Encode and set Toggley's icon
+	const encodedSvg = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+	await browser.action.setIcon({ path: encodedSvg });
 }
 
-browser.menus.create({
-	id: "use-systemtheme",
-	type: "normal",
-	title: "Use system theme (auto)",
-	contexts: ["action"],
-	icons: {
-		"16": "icons/browser.svg",
-		"32": "icons/browser.svg"
-	},
-});
+updateIconColor();
 
-browser.menus.onClicked.addListener(toggleSystemTheme);
+browser.theme.onUpdated.addListener(updateIconColor);

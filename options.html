@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Toggley Preferences</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background-color: #fff;
+    color: #15141A;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  select { width: 100%; padding: 4px; margin-bottom: 15px; }
+  button { margin-top: 15px; margin-bottom: 15px; padding: 6px 10px; }
+
+  #status {
+    margin-top: 15px;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  #status.success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  #status.error {
+    background-color: #f8c0c6;
+    color: #621820;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body { background-color: #23222b; color: #fbfbfe; }
+  }
+</style>
+</head>
+<body>
+
+<p>Preferred Light Theme:</p>
+<select id="lightTheme"></select>
+<p>Preferred Dark Theme:</p>
+<select id="darkTheme"></select>
+
+<button id="save">Save</button>
+
+<div id="status"></div>
+
+<script src="options.js"></script>
+
+</body>
+</html>
