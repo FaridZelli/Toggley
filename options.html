@@ -9,10 +9,21 @@
     background-color: #fff;
     color: #15141A;
     transition: background-color 0.2s, color 0.2s;
+/*     padding-bottom: 100px; */
+    min-height: 500px;
   }
 
   select { width: 100%; padding: 4px; margin-bottom: 15px; }
+
   button { margin-top: 15px; margin-bottom: 15px; padding: 6px 10px; }
+
+  input[type="text"]:focus {
+  outline: none;               /* remove the browser’s blue outline */
+  box-shadow: none;  /* Firefox’s blue focus color */
+  border: 2px solid #0a84ff;   /* consistent width */
+  border-radius: 4px
+  }
+
 
   #status {
     margin-top: 15px;
@@ -39,10 +50,28 @@
 
 <p>Preferred Light Theme:</p>
 <select id="lightTheme"></select>
+<label><input type="checkbox" id="lightColorOverride"> Override icon color</label>
+<div id="lightColorContainer" style="display:none; margin-top:15px; margin-bottom:0px;">
+  <input type="text" id="lightColor" placeholder=" CSS colors:  #ff0000  rgb(255, 0, 0)  hsl(0, 100%, 50%)  red " style="width:90%; padding:4px;">
+</div>
+
+<br>
+<br>
+
 <p>Preferred Dark Theme:</p>
 <select id="darkTheme"></select>
+<label><input type="checkbox" id="darkColorOverride"> Override icon color</label>
+<div id="darkColorContainer" style="display:none; margin-top:15px; margin-bottom:0px;">
+  <input type="text" id="darkColor" placeholder=" CSS colors:  #ff0000  rgb(255, 0, 0)  hsl(0, 100%, 50%)  red " style="width:90%; padding:4px;">
+</div>
+
+<br>
+<br>
 
 <button id="save">Save</button>
+<button id="restore">Restore Defaults</button>
+
+<br>
 
 <div id="status"></div>
 

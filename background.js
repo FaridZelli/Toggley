@@ -29,10 +29,20 @@ async function toggleTheme() {
 browser.action.onClicked.addListener(toggleTheme);
 
 async function updateIconColor() {
-	// Get stored light/dark theme IDs from extension settings
-	const { lightTheme, darkTheme } = await browser.storage.sync.get({
+	const {
+		lightTheme,
+		darkTheme,
+		lightColorOverride = false,
+		darkColorOverride = false,
+		lightColor = "",
+		darkColor = ""
+	} = await browser.storage.sync.get({
 		lightTheme: "firefox-compact-light@mozilla.org",
-		darkTheme: "firefox-compact-dark@mozilla.org"
+		darkTheme: "firefox-compact-dark@mozilla.org",
+		lightColorOverride: false,
+		darkColorOverride: false,
+		lightColor: "",
+		darkColor: ""
 	});
 
 	// Get currently enabled themes
@@ -50,16 +60,19 @@ async function updateIconColor() {
 		}
 	}
 
-	// Get theme colors for stroke
 	const theme = await browser.theme.getCurrent();
 	const colors = theme?.colors || {};
 
-	// Determine fallback color based on system color scheme
 	const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 	const fallbackColor = systemPrefersDark ? "rgb(251,251,254)" : "rgb(91,91,102)";
 
-	// Fallback order: icons -> toolbar_text -> system color scheme
-	const strokeColor = colors.icons ?? colors.toolbar_text ?? fallbackColor;
+	let strokeColor = colors.icons ?? colors.toolbar_text ?? fallbackColor;
+
+	if (currentMode === "light" && lightColorOverride && lightColor) {
+		strokeColor = lightColor;
+	} else if (currentMode === "dark" && darkColorOverride && darkColor) {
+		strokeColor = darkColor;
+	}
 
 	// SVGs
 	const svgLight = `
