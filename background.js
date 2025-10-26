@@ -45,17 +45,17 @@ async function updateIconColor() {
 		darkColor: ""
 	});
 
-	// Get currently enabled themes
+	// Get currently enabled theme
 	const themes = await browser.management.getAll();
 	const enabledTheme = themes.find(ext => ext.type === "theme" && ext.enabled);
 
-	// Determine theme based on stored IDs
+	// Determine theme type based on stored IDs
 	let currentMode = "light";
 	if (enabledTheme) {
 		if (enabledTheme.id === darkTheme) currentMode = "dark";
 		else if (enabledTheme.id === lightTheme) currentMode = "light";
 		else {
-			// Current theme is something else, default to light
+			// Default to light if the current theme is different
 			currentMode = "light";
 		}
 	}
@@ -91,3 +91,19 @@ async function updateIconColor() {
 updateIconColor();
 
 browser.theme.onUpdated.addListener(updateIconColor);
+
+browser.menus.create({
+	id: "open-preferences",
+	title: "Configure Toggley",
+	contexts: ["action"],
+	icons: {
+		"16": "icons/browser.svg",
+		"32": "icons/browser.svg"
+	},
+});
+
+browser.menus.onClicked.addListener((info, tab) => {
+	if (info.menuItemId === "open-preferences") {
+		browser.runtime.openOptionsPage();
+	}
+});

@@ -9,7 +9,6 @@
     background-color: #fff;
     color: #15141A;
     transition: background-color 0.2s, color 0.2s;
-/*     padding-bottom: 100px; */
     min-height: 500px;
   }
 
@@ -17,26 +16,27 @@
 
   button { margin-top: 15px; margin-bottom: 15px; padding: 6px 10px; }
 
+  input[type="text"] { width:90%; padding:4px; }
+
   input[type="text"]:focus {
-  outline: none;               /* remove the browser’s blue outline */
-  box-shadow: none;  /* Firefox’s blue focus color */
-  border: 2px solid #0a84ff;   /* consistent width */
+  outline: none;
+  box-shadow: none;
+  border: 2px solid #0a84ff;
   border-radius: 4px
   }
 
-
-  #status {
+  #status-message {
     margin-top: 15px;
     padding: 8px;
     border-radius: 4px;
     font-size: 0.9rem;
     display: none;
   }
-  #status.success {
+  #status-message.success {
     background-color: #d4edda;
     color: #155724;
   }
-  #status.error {
+  #status-message.error {
     background-color: #f8c0c6;
     color: #621820;
   }
@@ -49,31 +49,30 @@
 <body>
 
 <p>Preferred Light Theme:</p>
-<select id="lightTheme"></select>
-<label><input type="checkbox" id="lightColorOverride"> Override icon color</label>
-<div id="lightColorContainer" style="display:none; margin-top:15px; margin-bottom:0px;">
-  <input type="text" id="lightColor" placeholder=" CSS colors:  #ff0000  rgb(255, 0, 0)  hsl(0, 100%, 50%)  red " style="width:90%; padding:4px;">
+<select id="light-select"></select>
+<label><input type="checkbox" id="light-color-override-checkbox"> Override icon color</label>
+<div id="light-color-container" style="display:none; margin-top:15px; margin-bottom:0px;">
+  <input type="text" id="light-color-input" placeholder=" CSS colors:  #ff0000  rgb(255, 0, 0)  hsl(0, 100%, 50%)  red ">
 </div>
 
 <br>
 <br>
 
 <p>Preferred Dark Theme:</p>
-<select id="darkTheme"></select>
-<label><input type="checkbox" id="darkColorOverride"> Override icon color</label>
-<div id="darkColorContainer" style="display:none; margin-top:15px; margin-bottom:0px;">
-  <input type="text" id="darkColor" placeholder=" CSS colors:  #ff0000  rgb(255, 0, 0)  hsl(0, 100%, 50%)  red " style="width:90%; padding:4px;">
+<select id="dark-select"></select>
+<label><input type="checkbox" id="dark-color-override-checkbox"> Override icon color</label>
+<div id="dark-color-container" style="display:none; margin-top:15px; margin-bottom:0px;">
+  <input type="text" id="dark-color-input" placeholder=" CSS colors:  #ff0000  rgb(255, 0, 0)  hsl(0, 100%, 50%)  red ">
 </div>
 
 <br>
 <br>
 
-<button id="save">Save</button>
-<button id="restore">Restore Defaults</button>
+<button id="save-button">Save</button>
+<button id="reset-button">Reset</button>
+<button id="defaults-button" style="float: right;">Restore Defaults</button>
 
-<br>
-
-<div id="status"></div>
+<div id="status-message"></div>
 
 <script src="options.js"></script>
 
