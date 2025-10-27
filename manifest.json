@@ -42,6 +42,7 @@
       "id": "Toggley@FaridZelli",
       "data_collection_permissions": {
         "required": ["none"]
+      }
     }
   }
 }
