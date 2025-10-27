@@ -128,7 +128,7 @@ async function loadThemes() {
 	lightSelect.innerHTML = "";
 	darkSelect.innerHTML = "";
 
-	// Populate selects
+	// Populate selections
 	for (const theme of themes) {
 		const option = document.createElement("option");
 		option.value = theme.id;

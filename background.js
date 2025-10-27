@@ -1,3 +1,27 @@
+function normalizeColor(value) {
+	if (typeof value === "string") {
+		return value.trim();
+	}
+
+	if (Array.isArray(value) && value.length >= 3) {
+		let [r, g, b] = value;
+
+		if (r <= 1 && g <= 1 && b <= 1) {
+			r = Math.round(r * 255);
+			g = Math.round(g * 255);
+			b = Math.round(b * 255);
+		}
+
+		r = Math.min(255, Math.max(0, Math.round(r)));
+		g = Math.min(255, Math.max(0, Math.round(g)));
+		b = Math.min(255, Math.max(0, Math.round(b)));
+
+		return `rgb(${r}, ${g}, ${b})`;
+	}
+
+	return value;
+}
+
 async function getThemePrefs() {
 	const defaults = {
 		lightTheme: "firefox-compact-light@mozilla.org",
@@ -66,7 +90,10 @@ async function updateIconColor() {
 	const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 	const fallbackColor = systemPrefersDark ? "rgb(251,251,254)" : "rgb(91,91,102)";
 
-	let strokeColor = colors.icons ?? colors.toolbar_text ?? fallbackColor;
+	const iconColor = normalizeColor(colors.icons);
+	const textColor = normalizeColor(colors.toolbar_text);
+
+	let strokeColor = iconColor ?? textColor ?? fallbackColor;
 
 	if (currentMode === "light" && lightColorOverride && lightColor) {
 		strokeColor = lightColor;
@@ -91,6 +118,8 @@ async function updateIconColor() {
 updateIconColor();
 
 browser.theme.onUpdated.addListener(updateIconColor);
+browser.runtime.onStartup.addListener(updateIconColor);
+browser.runtime.onInstalled.addListener(updateIconColor);
 
 browser.menus.create({
 	id: "open-preferences",
