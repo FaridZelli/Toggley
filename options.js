@@ -107,7 +107,9 @@ function validateSelections() {
 
 async function loadThemes() {
 	// Fetch list of installed themes
-	const themes = (await browser.management.getAll()).filter(ext => ext.type === "theme");
+	const themes = (await browser.management.getAll())
+	.filter(ext => ext.type === "theme" && ext.id !== "default-theme@mozilla.org");
+
 	const {
 		lightTheme = "firefox-compact-light@mozilla.org",
 		darkTheme = "firefox-compact-dark@mozilla.org",
@@ -139,9 +141,9 @@ async function loadThemes() {
 		darkSelect.appendChild(option2);
 	}
 
-	// Restore selected values
-	lightSelect.value = lightTheme;
-	darkSelect.value = darkTheme;
+	// Restore selected values (if saved value isn't in the list, fall back to the first entry)
+	lightSelect.value = Array.from(lightSelect.options).some(o => o.value === lightTheme) ? lightTheme : (lightSelect.options[0]?.value || "");
+	darkSelect.value = Array.from(darkSelect.options).some(o => o.value === darkTheme) ? darkTheme : (darkSelect.options[0]?.value || "");
 
 	// Restore color override settings
 	lightColorOverrideCheckbox.checked = Boolean(lightColorOverride);
