@@ -10,6 +10,8 @@ const darkColorContainer = document.getElementById("dark-color-container");
 const lightColorInput = document.getElementById("light-color-input");
 const darkColorInput = document.getElementById("dark-color-input");
 
+const prefersColorSchemeSelect = document.getElementById("prefers-color-scheme-select");
+
 const saveButton = document.getElementById("save-button");
 const resetButton = document.getElementById("reset-button");
 const defaultsButton = document.getElementById("defaults-button");
@@ -110,21 +112,16 @@ async function loadThemes() {
 	const themes = (await browser.management.getAll())
 	.filter(ext => ext.type === "theme" && ext.id !== "default-theme@mozilla.org");
 
+	const prefs = await browser.storage.sync.get(DEFAULT_PREFS);
 	const {
-		lightTheme = "firefox-compact-light@mozilla.org",
-		darkTheme = "firefox-compact-dark@mozilla.org",
-		lightColorOverride = false,
-		darkColorOverride = false,
-		lightColor = "",
-		darkColor = ""
-	} = await browser.storage.sync.get([
-		"lightTheme",
-		"darkTheme",
-		"lightColorOverride",
-		"darkColorOverride",
-		"lightColor",
-		"darkColor"
-	]);
+		lightTheme,
+		darkTheme,
+		lightColorOverride,
+		darkColorOverride,
+		lightColor,
+		darkColor,
+		prefersColorSchemeOverride
+	} = prefs;
 
 	// Clear existing options to prevent duplicates
 	lightSelect.innerHTML = "";
@@ -152,6 +149,9 @@ async function loadThemes() {
 	darkColorInput.value = darkColor || "";
 	lightColorContainer.style.display = lightColorOverride ? "block" : "none";
 	darkColorContainer.style.display = darkColorOverride ? "block" : "none";
+
+	// Restore color scheme settings
+	prefersColorSchemeSelect.value = (prefersColorSchemeOverride === "firefox") ? "firefox" : "toggley";
 
 	// Force reflow to fix incorrectly positioned dropdown menu in Firefox
 	lightSelect.style.display = "none";
@@ -187,11 +187,14 @@ async function saveOptions() {
 		const lightColor = lightColorOverride ? lightColorInput.value.trim() : "";
 		const darkColor = darkColorOverride ? darkColorInput.value.trim() : "";
 
+		const prefersColorSchemeOverride = (prefersColorSchemeSelect.value === "firefox") ? "firefox" : "toggley";
+
 		const { lastUsed = "light" } = await browser.storage.sync.get("lastUsed");
 		await browser.storage.sync.set({
 			lightTheme, darkTheme,
 			lightColorOverride, darkColorOverride,
-			lightColor, darkColor
+			lightColor, darkColor,
+			prefersColorSchemeOverride
 		});
 
 		// Update theme immediately
@@ -225,7 +228,8 @@ async function defaultOptions() {
 		await browser.storage.sync.set({
 			lightTheme: "firefox-compact-light@mozilla.org",
 			darkTheme: "firefox-compact-dark@mozilla.org",
-			lastUsed: "light"
+			lastUsed: "light",
+			prefersColorSchemeOverride: "toggley"
 		});
 
 		// Update toolbar icon immediately

@@ -23,13 +23,7 @@ function normalizeColor(value) {
 }
 
 async function getThemePrefs() {
-	const defaults = {
-		lightTheme: "firefox-compact-light@mozilla.org",
-		darkTheme: "firefox-compact-dark@mozilla.org",
-		lastUsed: "light"
-	};
-	const prefs = await browser.storage.sync.get(defaults);
-	return prefs;
+	return await browser.storage.sync.get(DEFAULT_PREFS);
 }
 
 async function toggleTheme() {
@@ -53,21 +47,16 @@ async function toggleTheme() {
 browser.action.onClicked.addListener(toggleTheme);
 
 async function updateIconColor() {
+	const prefs = await browser.storage.sync.get(DEFAULT_PREFS);
 	const {
 		lightTheme,
 		darkTheme,
-		lightColorOverride = false,
-		darkColorOverride = false,
-		lightColor = "",
-		darkColor = ""
-	} = await browser.storage.sync.get({
-		lightTheme: "firefox-compact-light@mozilla.org",
-		darkTheme: "firefox-compact-dark@mozilla.org",
-		lightColorOverride: false,
-		darkColorOverride: false,
-		lightColor: "",
-		darkColor: ""
-	});
+		lightColorOverride,
+		darkColorOverride,
+		lightColor,
+		darkColor,
+		prefersColorSchemeOverride
+	} = prefs;
 
 	// Get currently enabled theme
 	const themes = await browser.management.getAll();
@@ -87,13 +76,17 @@ async function updateIconColor() {
 
 	// Apply prefs override corresponding to currentMode (keeps content prefers-color-scheme in sync)
 	try {
-		if (browser.browserSettings && browser.browserSettings.overrideContentColorScheme && typeof browser.browserSettings.overrideContentColorScheme.set === "function") {
+		// Only set overrideContentColorScheme when user prefers Toggley management
+		if (prefersColorSchemeOverride === "toggley"
+			&& browser.browserSettings
+			&& browser.browserSettings.overrideContentColorScheme
+			&& typeof browser.browserSettings.overrideContentColorScheme.set === "function") {
 			let value = "auto";
-			if (currentMode === "light") value = "light";
-			else if (currentMode === "dark") value = "dark";
-			else if (currentMode === "system") value = "auto";
-			await browser.browserSettings.overrideContentColorScheme.set({ value });
-		}
+		if (currentMode === "light") value = "light";
+		else if (currentMode === "dark") value = "dark";
+		else if (currentMode === "system") value = "auto";
+		await browser.browserSettings.overrideContentColorScheme.set({ value });
+			}
 	} catch (e) {
 		// Non-fatal: if the API isn't available for some Firefox build, just continue.
 		console.warn("Could not set overrideContentColorScheme:", e);
@@ -171,15 +164,6 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 		try {
 			await browser.management.setEnabled("default-theme@mozilla.org", true);
 			await browser.storage.sync.set({ lastUsed: "system" });
-
-			try {
-				if (browser.browserSettings && browser.browserSettings.overrideContentColorScheme && typeof browser.browserSettings.overrideContentColorScheme.set === "function") {
-					await browser.browserSettings.overrideContentColorScheme.set({ value: "auto" });
-				}
-			} catch (e) {
-				console.warn("Could not set overrideContentColorScheme from menu:", e);
-			}
-
 			await updateIconColor();
 		} catch (e) {
 			console.error("Failed to switch to system theme:", e);
