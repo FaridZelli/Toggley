@@ -223,14 +223,9 @@ async function defaultOptions() {
 
 	// Apply defaults
 	try {
-		// Change to light theme
-		await browser.management.setEnabled("firefox-compact-light@mozilla.org", true);
-		await browser.storage.sync.set({
-			lightTheme: "firefox-compact-light@mozilla.org",
-			darkTheme: "firefox-compact-dark@mozilla.org",
-			lastUsed: "light",
-			prefersColorSchemeOverride: "toggley"
-		});
+		// Change to light theme and set defaults
+		await browser.management.setEnabled(DEFAULT_PREFS.lightTheme, true);
+		await browser.storage.sync.set({ ...DEFAULT_PREFS });
 
 		// Update toolbar icon immediately
 		const bg = await browser.runtime.getBackgroundPage();
