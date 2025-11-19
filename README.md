@@ -7,7 +7,7 @@
 ---
 - A simple button that toggles between your favourite Light and Dark themes.
 - This project uses [Feather Icons](https://github.com/feathericons/feather)
-- Default shortcut: `Ctrl+Shift+0`
+- Default shortcut: `Ctrl+Alt+0`
 > See [Manage extension shortcuts in Firefox](https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox) for more info.
 ---
 <img src="screenshots/toggley_v2_showcase_1.png" alt="" width="400px" align="left">
