@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Toggley",
   "short_name": "toggley",
-  "version": "2.2",
+  "version": "2.3",
   "author": "Farid Zelli",
   "homepage_url": "https://github.com/FaridZelli/Toggley",
   "description": "Light / Dark mode toggle button and theme switcher for Firefox.",
@@ -18,7 +18,7 @@
   "commands": {
     "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+0"
+        "default": "Ctrl+Alt+0"
       },
       "description": "Toggle browser theme"
     }
