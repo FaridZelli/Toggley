@@ -31,7 +31,9 @@
     "management",
     "menus",
     "storage",
-    "browserSettings",
+    "browserSettings"
+  ],
+  "optional_permissions": [
     "nativeMessaging"
   ],
   "background": {

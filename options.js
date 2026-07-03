@@ -12,6 +12,8 @@ const darkColorInput = document.getElementById("dark-color-input");
 
 const prefersColorSchemeSelect = document.getElementById("prefers-color-scheme-select");
 
+const followOsCheckbox = document.getElementById("follow-os-checkbox");
+
 const saveButton = document.getElementById("save-button");
 const resetButton = document.getElementById("reset-button");
 const defaultsButton = document.getElementById("defaults-button");
@@ -153,6 +155,11 @@ async function loadThemes() {
 	// Restore color scheme settings
 	prefersColorSchemeSelect.value = (prefersColorSchemeOverride === "firefox") ? "firefox" : "toggley";
 
+	// Restore follow-OS checkbox, gated on the optional nativeMessaging permission actually being granted
+	const { followOsColorScheme } = prefs;
+	const hasNM = await browser.permissions.contains({ permissions: ["nativeMessaging"] });
+	followOsCheckbox.checked = Boolean(followOsColorScheme) && hasNM;
+
 	// Force reflow to fix incorrectly positioned dropdown menu in Firefox
 	lightSelect.style.display = "none";
 	void lightSelect.offsetHeight;
@@ -189,12 +196,15 @@ async function saveOptions() {
 
 		const prefersColorSchemeOverride = (prefersColorSchemeSelect.value === "firefox") ? "firefox" : "toggley";
 
+		const followOsColorScheme = followOsCheckbox.checked;
+
 		const { lastUsed = "light" } = await browser.storage.sync.get("lastUsed");
 		await browser.storage.sync.set({
 			lightTheme, darkTheme,
 			lightColorOverride, darkColorOverride,
 			lightColor, darkColor,
-			prefersColorSchemeOverride
+			prefersColorSchemeOverride,
+			followOsColorScheme
 		});
 
 		// Update theme immediately
@@ -277,6 +287,18 @@ darkColorInput.addEventListener("input", () => {
 lightSelect.addEventListener("change", validateSelections);
 
 darkSelect.addEventListener("change", validateSelections);
+
+followOsCheckbox.addEventListener("change", async () => {
+	if (followOsCheckbox.checked) {
+		const granted = await browser.permissions.request({ permissions: ["nativeMessaging"] });
+		if (!granted) {
+			followOsCheckbox.checked = false;
+			showStatus("Permission required to follow OS color scheme", "error");
+		}
+	} else {
+		await browser.permissions.remove({ permissions: ["nativeMessaging"] }).catch(() => {});
+	}
+});
 
 saveButton.addEventListener("click", saveOptions);
 loadThemes();

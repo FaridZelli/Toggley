@@ -7,5 +7,6 @@ const DEFAULT_PREFS = {
 	lightColor: "",
 	darkColor: "",
 	lastUsed: "light",
-	prefersColorSchemeOverride: "toggley"
+	prefersColorSchemeOverride: "toggley",
+	followOsColorScheme: false
 };

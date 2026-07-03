@@ -26,26 +26,6 @@ async function getThemePrefs() {
 	return await browser.storage.sync.get(DEFAULT_PREFS);
 }
 
-async function toggleTheme() {
-	const { lightTheme, darkTheme, lastUsed } = await getThemePrefs();
-
-	// Get info for both themes
-	const lightInfo = await browser.management.get(lightTheme).catch(() => null);
-	const darkInfo = await browser.management.get(darkTheme).catch(() => null);
-
-	if (!lightInfo || !darkInfo) return;
-
-	if (lastUsed === "light") {
-		await browser.management.setEnabled(darkTheme, true);
-		await browser.storage.sync.set({ lastUsed: "dark" });
-	} else {
-		await browser.management.setEnabled(lightTheme, true);
-		await browser.storage.sync.set({ lastUsed: "light" });
-	}
-}
-
-browser.action.onClicked.addListener(toggleTheme);
-
 async function setMode(mode) {
 	const { lightTheme, darkTheme } = await getThemePrefs();
 	const targetId = mode === "dark" ? darkTheme : lightTheme;
@@ -55,11 +35,37 @@ async function setMode(mode) {
 	await browser.storage.sync.set({ lastUsed: mode });
 }
 
-// Native messaging bridge: follow OS color-scheme via a helper that watches gsettings.
-(function initOsBridge() {
+async function toggleTheme() {
+	const { lightTheme, darkTheme, lastUsed } = await getThemePrefs();
+
+	// Get info for both themes; only toggle if both are installed
+	const lightInfo = await browser.management.get(lightTheme).catch(() => null);
+	const darkInfo = await browser.management.get(darkTheme).catch(() => null);
+	if (!lightInfo || !darkInfo) return;
+
+	await setMode(lastUsed === "light" ? "dark" : "light");
+}
+
+browser.action.onClicked.addListener(toggleTheme);
+
+// Native messaging bridge: follow OS color-scheme via an opt-in helper.
+// Gated on the followOsColorScheme setting; only runs if the user has enabled
+// it in options (which also triggers the optional nativeMessaging permission).
+const OsBridge = (function () {
 	let port = null;
 	let lastMode = null;
+	let wantConnected = false;
+
+	function disconnect() {
+		wantConnected = false;
+		if (port) {
+			try { port.disconnect(); } catch (e) { /* ignore */ }
+			port = null;
+		}
+	}
+
 	function connect() {
+		if (!wantConnected || port) return;
 		try {
 			port = browser.runtime.connectNative("toggley_bridge");
 			port.onMessage.addListener((msg) => {
@@ -72,15 +78,36 @@ async function setMode(mode) {
 			});
 			port.onDisconnect.addListener(() => {
 				port = null;
-				setTimeout(connect, 5000);
+				if (wantConnected) setTimeout(connect, 5000);
 			});
 		} catch (e) {
 			console.warn("toggley_bridge connect failed:", e);
-			setTimeout(connect, 5000);
+			port = null;
+			if (wantConnected) setTimeout(connect, 5000);
 		}
 	}
-	connect();
+
+	return {
+		async syncFromPrefs() {
+			const { followOsColorScheme } = await browser.storage.sync.get(DEFAULT_PREFS);
+			const hasNM = await browser.permissions.contains({ permissions: ["nativeMessaging"] });
+			const shouldConnect = Boolean(followOsColorScheme) && hasNM;
+			if (shouldConnect && !wantConnected) {
+				wantConnected = true;
+				connect();
+			} else if (!shouldConnect && wantConnected) {
+				disconnect();
+			}
+		}
+	};
 })();
+
+OsBridge.syncFromPrefs();
+browser.storage.onChanged.addListener((changes, area) => {
+	if (area === "sync" && "followOsColorScheme" in changes) OsBridge.syncFromPrefs();
+});
+browser.permissions.onAdded.addListener(() => OsBridge.syncFromPrefs());
+browser.permissions.onRemoved.addListener(() => OsBridge.syncFromPrefs());
 
 async function updateIconColor() {
 	const prefs = await browser.storage.sync.get(DEFAULT_PREFS);
