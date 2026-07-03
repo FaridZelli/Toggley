@@ -31,7 +31,8 @@
     "management",
     "menus",
     "storage",
-    "browserSettings"
+    "browserSettings",
+    "nativeMessaging"
   ],
   "background": {
     "scripts": [

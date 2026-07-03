@@ -46,6 +46,42 @@ async function toggleTheme() {
 
 browser.action.onClicked.addListener(toggleTheme);
 
+async function setMode(mode) {
+	const { lightTheme, darkTheme } = await getThemePrefs();
+	const targetId = mode === "dark" ? darkTheme : lightTheme;
+	const info = await browser.management.get(targetId).catch(() => null);
+	if (!info) return;
+	await browser.management.setEnabled(targetId, true);
+	await browser.storage.sync.set({ lastUsed: mode });
+}
+
+// Native messaging bridge: follow OS color-scheme via a helper that watches gsettings.
+(function initOsBridge() {
+	let port = null;
+	let lastMode = null;
+	function connect() {
+		try {
+			port = browser.runtime.connectNative("toggley_bridge");
+			port.onMessage.addListener((msg) => {
+				if (!msg) return;
+				const m = msg.mode;
+				if ((m === "light" || m === "dark") && m !== lastMode) {
+					lastMode = m;
+					setMode(m).catch((e) => console.warn("setMode failed", e));
+				}
+			});
+			port.onDisconnect.addListener(() => {
+				port = null;
+				setTimeout(connect, 5000);
+			});
+		} catch (e) {
+			console.warn("toggley_bridge connect failed:", e);
+			setTimeout(connect, 5000);
+		}
+	}
+	connect();
+})();
+
 async function updateIconColor() {
 	const prefs = await browser.storage.sync.get(DEFAULT_PREFS);
 	const {
