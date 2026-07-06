@@ -12,6 +12,10 @@ const darkColorInput = document.getElementById("dark-color-input");
 
 const prefersColorSchemeSelect = document.getElementById("prefers-color-scheme-select");
 
+const scheduleCheckbox = document.getElementById("schedule-enabled-checkbox");
+const lightTimeInput = document.getElementById("light-time-input");
+const darkTimeInput = document.getElementById("dark-time-input");
+
 const saveButton = document.getElementById("save-button");
 const resetButton = document.getElementById("reset-button");
 const defaultsButton = document.getElementById("defaults-button");
@@ -152,6 +156,11 @@ async function loadThemes() {
 
 	// Restore color scheme settings
 	prefersColorSchemeSelect.value = (prefersColorSchemeOverride === "firefox") ? "firefox" : "toggley";
+	
+	// Restore schedule settings
+	scheduleCheckbox.checked = Boolean(prefs.scheduleEnabled);
+	lightTimeInput.value = prefs.lightTime;
+	darkTimeInput.value = prefs.darkTime;
 
 	// Force reflow to fix incorrectly positioned dropdown menu in Firefox
 	lightSelect.style.display = "none";
@@ -188,13 +197,18 @@ async function saveOptions() {
 		const darkColor = darkColorOverride ? darkColorInput.value.trim() : "";
 
 		const prefersColorSchemeOverride = (prefersColorSchemeSelect.value === "firefox") ? "firefox" : "toggley";
+		
+		const scheduleEnabled = scheduleCheckbox.checked;
+		const lightTime = lightTimeInput.value;
+		const darkTime = darkTimeInput.value;
 
 		const { lastUsed = "light" } = await browser.storage.sync.get("lastUsed");
 		await browser.storage.sync.set({
 			lightTheme, darkTheme,
 			lightColorOverride, darkColorOverride,
 			lightColor, darkColor,
-			prefersColorSchemeOverride
+			prefersColorSchemeOverride,
+			scheduleEnabled, lightTime, darkTime
 		});
 
 		// Update theme immediately
@@ -288,3 +302,13 @@ resetButton.addEventListener("click", async () => {
 
 defaultsButton.addEventListener("click", defaultOptions);
 loadThemes();
+
+browser.storage.onChanged.addListener(async (changes, area) => {
+	if (area === "sync") {
+		await loadThemes();
+		
+		if (Object.keys(changes).some(key => key !== "lastUsed")) {
+			showStatus("Saved", "success");
+		}
+	}
+});

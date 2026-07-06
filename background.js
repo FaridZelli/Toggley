@@ -44,6 +44,56 @@ async function toggleTheme() {
 	}
 }
 
+// Toggley schedule logic
+
+async function updateMenuCheckbox() {
+	const prefs = await getThemePrefs();
+	await browser.menus.update("schedule-enabled", { checked: prefs.scheduleEnabled });
+}
+
+async function updateSchedule() {
+	await browser.alarms.clear("schedule-light");
+	await browser.alarms.clear("schedule-dark");
+
+	const prefs = await getThemePrefs();
+	if (!prefs.scheduleEnabled) return;
+
+	const now = new Date();
+	const getNextAlarm = (timeStr) => {
+		if (!timeStr) return null;
+		const [h, m] = timeStr.split(":").map(Number);
+		const target = new Date();
+		target.setHours(h, m, 0, 0);
+		if (target <= now) target.setDate(target.getDate() + 1);
+		return target.getTime();
+	};
+
+	if (prefs.lightTime) browser.alarms.create("schedule-light", { when: getNextAlarm(prefs.lightTime) });
+	if (prefs.darkTime) browser.alarms.create("schedule-dark", { when: getNextAlarm(prefs.darkTime) });
+}
+
+browser.alarms.onAlarm.addListener(async (alarm) => {
+	const prefs = await getThemePrefs();
+	if (alarm.name === "schedule-light") {
+		await browser.management.setEnabled(prefs.lightTheme, true);
+		await browser.storage.sync.set({ lastUsed: "light" });
+	} else if (alarm.name === "schedule-dark") {
+		await browser.management.setEnabled(prefs.darkTheme, true);
+		await browser.storage.sync.set({ lastUsed: "dark" });
+	}
+	await updateIconColor();
+	updateSchedule(); // Reschedule for the next day
+});
+
+browser.storage.onChanged.addListener((changes, area) => {
+	if (area === "sync" && ("scheduleEnabled" in changes || "lightTime" in changes || "darkTime" in changes)) {
+		updateSchedule();
+		updateMenuCheckbox();
+	}
+});
+
+// Toggley icon logic
+
 browser.action.onClicked.addListener(toggleTheme);
 
 async function updateIconColor() {
@@ -157,6 +207,13 @@ browser.menus.create({
 	},
 });
 
+browser.menus.create({
+	id: "schedule-enabled",
+	title: "Custom schedule",
+	type: "checkbox",
+	contexts: ["action"]
+});
+
 browser.menus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-preferences") {
 		browser.runtime.openOptionsPage();
@@ -168,5 +225,10 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 		} catch (e) {
 			console.error("Failed to switch to system theme:", e);
 		}
-	}
+	} else if (info.menuItemId === "schedule-enabled") {
+		await browser.storage.sync.set({ scheduleEnabled: info.checked });
+    }
 });
+
+updateMenuCheckbox();
+updateSchedule();

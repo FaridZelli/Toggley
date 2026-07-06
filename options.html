@@ -9,7 +9,6 @@
     background-color: #fff;
     color: #15141A;
     transition: background-color 0.2s, color 0.2s;
-    min-height: 500px;
   }
 
   select { width: 100%; padding: 4px; margin-bottom: 15px; }
@@ -73,6 +72,17 @@
   <option value="toggley">Managed by Toggley</option>
   <option value="firefox">Managed by Firefox</option>
 </select>
+
+<br>
+<br>
+
+<label><input type="checkbox" id="schedule-enabled-checkbox"> Custom schedule</label>
+<div style="margin-top:15px; margin-bottom:0px;">
+  <label>Light theme at: <input type="time" id="light-time-input"></label>
+</div>
+<div style="margin-top:15px; margin-bottom:0px;">
+  <label>Dark theme at: <input type="time" id="dark-time-input"></label>
+</div>
 
 <br>
 <br>

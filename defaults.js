@@ -7,5 +7,8 @@ const DEFAULT_PREFS = {
 	lightColor: "",
 	darkColor: "",
 	lastUsed: "light",
-	prefersColorSchemeOverride: "toggley"
+	prefersColorSchemeOverride: "toggley",
+	scheduleEnabled: false,
+	lightTime: "08:00",
+	darkTime: "20:00"
 };
