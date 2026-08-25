@@ -35,7 +35,15 @@ async function toggleTheme() {
 
 	if (!lightInfo || !darkInfo) return;
 
-	if (lastUsed === "light") {
+	let nextMode = lastUsed === "light" ? "dark" : "light";
+
+	if (lastUsed === "system") {
+		const themes = await browser.management.getAll();
+		const enabledTheme = themes.find(ext => ext.type === "theme" && ext.enabled);
+		nextMode = enabledTheme && enabledTheme.id === darkTheme ? "light" : "dark";
+	}
+
+	if (nextMode === "dark") {
 		await browser.management.setEnabled(darkTheme, true);
 		await browser.storage.sync.set({ lastUsed: "dark" });
 	} else {
@@ -105,6 +113,7 @@ async function updateIconColor() {
 		darkColorOverride,
 		lightColor,
 		darkColor,
+		lastUsed,
 		prefersColorSchemeOverride
 	} = prefs;
 
@@ -114,7 +123,9 @@ async function updateIconColor() {
 
 	// Determine theme type based on stored IDs
 	let currentMode = "light";
-	if (enabledTheme) {
+	if (lastUsed === "system") {
+		currentMode = "system";
+	} else if (enabledTheme) {
 		if (enabledTheme.id === darkTheme) currentMode = "dark";
 		else if (enabledTheme.id === lightTheme) currentMode = "light";
 		else if (enabledTheme.id === "default-theme@mozilla.org") currentMode = "system";
@@ -186,6 +197,25 @@ updateIconColor();
 browser.theme.onUpdated.addListener(updateIconColor);
 browser.runtime.onStartup.addListener(updateIconColor);
 browser.runtime.onInstalled.addListener(updateIconColor);
+async function applySystemTheme() {
+	const prefs = await getThemePrefs();
+	const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+	const themeToEnable = prefersDark ? prefs.darkTheme : prefs.lightTheme;
+
+	await browser.management.setEnabled(themeToEnable, true);
+	await browser.storage.sync.set({ lastUsed: "system" });
+	await updateIconColor();
+}
+
+const systemColorSchemeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+systemColorSchemeMedia.addEventListener("change", async () => {
+	const prefs = await getThemePrefs();
+	if (prefs.lastUsed !== "system") return;
+
+	const themeToEnable = systemColorSchemeMedia.matches ? prefs.darkTheme : prefs.lightTheme;
+	await browser.management.setEnabled(themeToEnable, true);
+	await updateIconColor();
+});
 
 browser.menus.create({
 	id: "open-preferences",
@@ -219,9 +249,7 @@ browser.menus.onClicked.addListener(async (info, tab) => {
 		browser.runtime.openOptionsPage();
 	} else if (info.menuItemId === "use-system-theme") {
 		try {
-			await browser.management.setEnabled("default-theme@mozilla.org", true);
-			await browser.storage.sync.set({ lastUsed: "system" });
-			await updateIconColor();
+			await applySystemTheme();
 		} catch (e) {
 			console.error("Failed to switch to system theme:", e);
 		}

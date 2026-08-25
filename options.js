@@ -212,7 +212,12 @@ async function saveOptions() {
 		});
 
 		// Update theme immediately
-		const themeToActivate = lastUsed === "dark" ? darkTheme : lightTheme;
+		let themeToActivate;
+		if (lastUsed === "system") {
+			themeToActivate = window.matchMedia("(prefers-color-scheme: dark)").matches ? darkTheme : lightTheme;
+		} else {
+			themeToActivate = lastUsed === "dark" ? darkTheme : lightTheme;
+		}
 		await browser.management.setEnabled(themeToActivate, true);
 
 		// Update toolbar icon immediately
