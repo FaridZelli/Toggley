@@ -4,11 +4,21 @@
 <meta charset="utf-8">
 <title>Toggley Preferences</title>
 <style>
+  html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto !important;
+  min-height: 620px !important;
+  margin: 0;
+  }
+
   body {
     font-family: sans-serif;
     background-color: #fff;
     color: #15141A;
     transition: background-color 0.2s, color 0.2s;
+    padding: 12px;
+    box-sizing: border-box;
   }
 
   select { width: 100%; padding: 4px; margin-bottom: 15px; }
@@ -46,55 +56,46 @@
 </style>
 </head>
 <body>
+  <p>Preferred Light Theme:</p>
+  <select id="light-select"></select>
+  <label><input type="checkbox" id="light-color-override-checkbox"> Override icon color</label>
+  <div id="light-color-container" style="display:none; margin-top:12px;">
+    <input type="text" id="light-color-input" placeholder="CSS colors:  #ff0000  /  rgb(255, 0, 0)  /  hsl(0, 100%, 50%)  /  red">
+  </div>
 
-<p>Preferred Light Theme:</p>
-<select id="light-select"></select>
-<label><input type="checkbox" id="light-color-override-checkbox"> Override icon color</label>
-<div id="light-color-container" style="display:none; margin-top:15px; margin-bottom:0px;">
-  <input type="text" id="light-color-input" placeholder=" CSS colors: #ff0000 rgb(255, 0, 0) hsl(0, 100%, 50%) red ">
-</div>
+  <p style="margin-top: 1.5em;">Preferred Dark Theme:</p>
+  <select id="dark-select"></select>
+  <label><input type="checkbox" id="dark-color-override-checkbox"> Override icon color</label>
+  <div id="dark-color-container" style="display:none; margin-top:12px;">
+    <input type="text" id="dark-color-input" placeholder="CSS colors:  #ff0000  /  rgb(255, 0, 0)  /  hsl(0, 100%, 50%)  /  red">
+  </div>
 
-<br>
-<br>
+  <p style="margin-top: 1.5em;">Website Appearance:</p>
+  <select id="prefers-color-scheme-select" title="Who manages website prefers-color-scheme">
+    <option value="toggley">Managed by Toggley</option>
+    <option value="firefox">Managed by Firefox</option>
+  </select>
 
-<p>Preferred Dark Theme:</p>
-<select id="dark-select"></select>
-<label><input type="checkbox" id="dark-color-override-checkbox"> Override icon color</label>
-<div id="dark-color-container" style="display:none; margin-top:15px; margin-bottom:0px;">
-  <input type="text" id="dark-color-input" placeholder=" CSS colors: #ff0000 rgb(255, 0, 0) hsl(0, 100%, 50%) red ">
-</div>
+  <label style="margin-top:1.5em;">
+    <input type="checkbox" id="schedule-enabled-checkbox"> Custom schedule
+  </label>
+  <div style="margin-top:12px;">
+    <span style="font-family: monospace; display: inline-block; width: 11rem;">Enable light theme at:</span>
+    <input type="time" id="light-time-input">
+  </div>
+  <div style="margin-top:12px;">
+    <span style="font-family: monospace; display: inline-block; width: 11rem;">Enable dark theme at:</span>
+    <input type="time" id="dark-time-input">
+  </div>
 
-<br>
-<br>
+  <div style="margin-top: 1.5em;">
+    <button id="save-button">Save</button>
+    <button id="reset-button">Reset</button>
+    <button id="defaults-button" style="float: right;">Restore Defaults</button>
+  </div>
+  <div id="status-message"></div>
 
-<p>Website Appearance:</p>
-<select id="prefers-color-scheme-select" title="Who manages website prefers-color-scheme">
-  <option value="toggley">Managed by Toggley</option>
-  <option value="firefox">Managed by Firefox</option>
-</select>
-
-<br>
-<br>
-
-<label><input type="checkbox" id="schedule-enabled-checkbox"> Custom schedule</label>
-<div style="margin-top:15px; margin-bottom:0px;">
-  <label>Light theme at: <input type="time" id="light-time-input"></label>
-</div>
-<div style="margin-top:15px; margin-bottom:0px;">
-  <label>Dark theme at: <input type="time" id="dark-time-input"></label>
-</div>
-
-<br>
-<br>
-
-<button id="save-button">Save</button>
-<button id="reset-button">Reset</button>
-<button id="defaults-button" style="float: right;">Restore Defaults</button>
-
-<div id="status-message"></div>
-
-<script src="defaults.js"></script>
-<script src="options.js"></script>
-
+  <script src="defaults.js"></script>
+  <script src="options.js"></script>
 </body>
 </html>
