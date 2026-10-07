@@ -1,8 +1,8 @@
 # Toggley
-[![Mozilla Add-on Users](https://img.shields.io/amo/users/Toggley%40FaridZelli?style=for-the-badge&logo=firefoxbrowser&logoColor=white&labelColor=orange&color=gold&cacheSeconds=86400)](https://addons.mozilla.org/en-US/firefox/addon/toggley/)
+[![Firefox Add-ons Users](https://img.shields.io/amo/users/Toggley%40FaridZelli?style=for-the-badge&logo=firefoxbrowser&label=firefox%20users&logoColor=white&labelColor=orange&color=gold&cacheSeconds=86400)](https://addons.mozilla.org/en-US/firefox/addon/toggley/)
   
   
-[![Mozilla Add-on Stars](https://img.shields.io/amo/stars/Toggley%40FaridZelli?style=for-the-badge&logo=mozilla&labelColor=black&color=gold&cacheSeconds=86400)](https://addons.mozilla.org/en-US/firefox/addon/toggley/)
+[![Firefox Add-ons Stars](https://img.shields.io/amo/stars/Toggley%40FaridZelli?style=for-the-badge&logo=mozilla&label=amo%20stars&labelColor=black&color=gold&cacheSeconds=86400)](https://addons.mozilla.org/en-US/firefox/addon/toggley/)
 
 ---
 A simple button that toggles between your favourite Light and Dark themes.
